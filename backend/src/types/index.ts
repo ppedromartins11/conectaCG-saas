@@ -1,4 +1,8 @@
-import { Request } from 'express'
+import { Request } from "express"
+
+export interface AuthRequest extends Request {
+  user?: any
+}
 
 export interface AuthPayload {
   userId: string
