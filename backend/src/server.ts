@@ -37,10 +37,15 @@ if (env.NODE_ENV !== 'test') {
 // Rate limiting
 app.use(globalLimiter)
 
+// **Rota raiz para teste rápido**
+app.get('/', (_req, res) => {
+  res.json({ success: true, message: 'API ConectaCG rodando!', env: env.NODE_ENV })
+})
+
 // Health check
 app.get('/health', (_req, res) => res.json({ status: 'ok', env: env.NODE_ENV, ts: new Date().toISOString() }))
 
-// API Routes
+// API Routes prefixadas
 app.use('/api/v1', router)
 
 // Error handling
@@ -56,10 +61,12 @@ async function bootstrap() {
       logger.info(`🚀 ConectaCG API running on port ${env.PORT} [${env.NODE_ENV}]`)
     })
 
+    // Cron jobs somente em produção
     if (env.NODE_ENV === 'production') {
       startCronJobs()
     }
 
+    // Fechamento correto ao receber SIGTERM
     process.on('SIGTERM', async () => {
       logger.info('SIGTERM received, shutting down...')
       await prisma.$disconnect()
